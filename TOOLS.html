@@ -1,0 +1,189 @@
+# TOOLS.md — Sandmanpo Full Tool Inventory
+*Last updated: 2026-05-12. Forensic sweep of all credentials, skills, scripts, and integrations.*
+
+---
+
+## 📡 DEVICES & INFRASTRUCTURE
+
+| Device | Address | User | Notes |
+|--------|---------|------|-------|
+| **Sandmanpo NUC** | localhost | root | Primary runtime. All scripts run here. |
+| **Mac Mini** | Tailscale `100.97.232.76` | clawman | SSH key `~/.ssh/id_ed25519`. "Allow JavaScript from Apple Events" enabled in Chrome → osascript + JS injection. |
+| **QNAP NAS** | `192.168.1.9` (LAN), Tailscale `100.119.89.42` | povidio / openclaw-api | SSH port 24. Volumes: Data, media, Povidio, System. HTTP 8080, HTTPS 443. |
+| **Roon Core** | Tailscale `100.104.9.71` | rock | CLI: `/root/.openclaw/workspace/repos/roon-controller/roonctl <cmd> [zone]`. Zones: `HQ`, `NAD_M17`, `Optical_Rendu`. |
+
+---
+
+## 🔑 API CREDENTIALS & INTEGRATIONS
+
+### AI / LLM
+| Tool | Key Location | Notes |
+|------|-------------|-------|
+| **Anthropic (Claude)** | `credentials/anthropic-admin-key.txt` | Admin key. Claude Sonnet/Haiku/Opus. Primary LLM for all agent turns. |
+
+### Media / Video
+| Tool | Key Location | Notes |
+|------|-------------|-------|
+| **Higgsfield** | `~/.config/higgsfield/credentials.json` | Unified generative media API. 30+ models: images (FLUX.2, Nano Banana Pro, GPT Image 2, Grok Image, Seedream, Soul V2) + videos (Kling v3.0, Seedance 2.0, Veo 3.1, Wan 2.7, Cinematic Studio). CLI: `higgsfield generate create <model> --prompt "..." --wait`. Account: paulo.ovidio@gmail.com, Plus plan, 3,915 credits. MCP: `https://mcp.higgsfield.ai/mcp`. Auth via device flow: `higgsfield auth login`. |
+| **HeyGen** | `credentials/heygen/api-key.txt` | Avatar video generation. API v2 + v3 Video Agent. Avatar: `Brandon_expressive2_public` (Grey Suit). Voice: `3b2a59d6edb54e79a40b29726a12d1c3` (Calm Carlos, PT-BR). Endpoint: `api.heygen.com`. |
+| **YouTube** | `credentials/youtube.json` | API key: `***REVOKED_GOOGLE_API_KEY***`. Search, video metadata. |
+| **OpenAI Whisper** | Local install | Speech-to-text. CLI: `whisper`. No API key needed. Local only. |
+
+### Web / Search / Scraping
+| Tool | Key Location | Notes |
+|------|-------------|-------|
+| **SerpAPI** | `credentials/serpapi.json` | Key: `834fd31...`. Google search results, news, jobs. Used by `news-daily.mjs`. |
+| **Firecrawl** | skill `firecrawl-cli` | Web scraping, crawling, browser automation, AI web agent. Requires `firecrawl login` or `FIRECRAWL_API_KEY`. `firecrawl scrape <url>`, `firecrawl crawl <url>`, `firecrawl search <query>`. |
+| **Adzuna** | `credentials/adzuna.json` | App ID: `446ca00b`. Job listings API. Used by `job-monitor.mjs`. |
+| **Aviasales/Travelpayouts** | `credentials/aviasales.json` | Key: `fca65da7...`. Flight data API. Used by `flight-monitor.mjs`. |
+
+### Finance
+| Tool | Key Location | Notes |
+|------|-------------|-------|
+| **Pluggy Open Finance BR** | `credentials/pluggy/` | Client ID + Secret + API key. Brazilian open banking — bank statements, balances. Used by `pluggy-connect-server.mjs`. |
+| **Stripe Issuing** | `credentials/stripe.json` | Test mode. US account. Monthly limit $50. Cardholder: `ich_1TOm2xFfPmR8oCagld7fn83x`. For autonomous agent purchases. |
+| **Polar** | `credentials/polar/` | Token + client. Subscription/revenue management. Synced via `polar-workout-sync.mjs`. |
+
+### Productivity / Comms
+| Tool | Key Location | Notes |
+|------|-------------|-------|
+| **Notion** | `credentials/notion/token.txt` | Token: `ntn_h2246...`. Pages config in `notion/pages.json`. Used by `notion-publish.mjs`. |
+| **Google APIs** | `credentials/google/` | OAuth token + desktop client + API key. Covers: Gmail, Calendar, Drive, Sheets, Docs, Maps. Used by `gog` skill + multiple scripts. |
+| **X (Twitter)** | `credentials/x-api.json` | Consumer key/secret, bearer token, access tokens. `xurl` skill + `x-monitor.mjs`. |
+| **GitHub** | `credentials/github/token.txt` | Personal access token. Repo scope. Used by `github-pages-publish.mjs`. Publishes to `pauloovidio-a11y/html-outputs` (shared with Superclawman). |
+| **OneDrive** | `~/.config/onedrive/config` | Microsoft OAuth complete. Sync folder: `/home/sandmanpo/OneDrive/sandman-reports/`. Daemon running as systemd user service. Share links via `onedrive-share.mjs`. |
+
+### WhatsApp
+| Tool | Key Location | Notes |
+|------|-------------|-------|
+| **WA Bridge** | `skills/openclaw-whatsapp` | Send/receive messages, auto-reply agents, QR pairing, message search, contact sync. Used by `wa-manager.mjs`. |
+
+---
+
+## 🛠️ SKILLS (Installed)
+
+| Skill | Description | Trigger |
+|-------|-------------|---------|
+| **html-it** | 4-level HTML output framework (Static Doc / Visual Artifact / Interactive / Throwaway). Warm-neutral palette. Single-file discipline. | "html-it", "/html-it", "render as html", "build me an html" |
+| **firecrawl-cli** | Web scraping, crawling, site mapping, browser automation, AI web agent. | "scrape URL", "crawl site", "firecrawl search" |
+| **neural-memory** | Associative memory with spreading activation. Persistent recall across sessions. | Auto — proactive on every session start |
+| **google-maps** | Geocoding, nearby places, directions, distance/travel time. | "where is", "nearby", "directions", "how far" |
+| **openai-whisper** | Local speech-to-text. No API key. CLI: `whisper`. | "transcribe", "speech to text" |
+| **computer-use-skill** | Remote browser automation via CUA. | "open browser", "click", "fill form", "remote browser" |
+| **video-frames** | Extract frames/clips from video via ffmpeg. | "extract frames", "clip video" |
+| **sonoscli** | Control Sonos speakers — discover, status, play, volume, group. | "play music", "sonos", "volume" |
+| **openhue** | Control Philips Hue lights/scenes via OpenHue CLI. | "lights", "hue", "turn on/off" |
+| **stripe-issuing** | Create/manage virtual cards for autonomous purchases. | "buy", "purchase", "pay for" |
+| **openclaw-whatsapp** | WhatsApp send/receive, agents, search, contacts. | All WA messaging |
+| **xurl** | Twitter/X research and content intelligence. | "twitter", "x post", "tweet" |
+| **1password** | 1Password CLI — read/inject/run secrets. | "1password", "op", "secret" |
+| **camsnap** | Capture frames/clips from RTSP/ONVIF cameras. | "camera", "snapshot", "RTSP" |
+| **github-cli** | Full GitHub CLI (gh) — repos, issues, PRs, Actions, releases, search. | "github", "gh", "PR", "repo" |
+| **gog** | Google Workspace CLI — Gmail, Calendar, Drive, Contacts, Sheets, Docs. | "gmail", "calendar", "drive", "sheets" |
+| **elite-longterm-memory** | Long-term memory persistence and recall. | Auto |
+| **fluid-memory** | Fluid memory management. | Auto |
+| **memory-tiering** | Memory tiering and prioritization. | Auto |
+| **summarize** | Document/content summarization. | "summarize", "tldr" |
+| **voice-transcription** | Voice/audio transcription pipeline. | "transcribe audio" |
+| **whatsapp-utils** | WhatsApp utility functions. | Internal |
+| **capability-evolver-pro** | Self-improvement and capability evolution. | Internal |
+| **self-improving-agent** | Agent self-improvement routines. | Internal |
+| **ontology** | Knowledge ontology management. | Internal |
+| **mcporter** | MCP server/tool porting. | Internal |
+| **ordercli** | Order management CLI. | "order", "purchase" |
+| **obsidian** | Obsidian vault integration. | "obsidian", "note" |
+
+---
+
+## 📝 SCRIPTS (Active)
+
+| Script | Purpose |
+|--------|---------|
+| `wa-manager.mjs` | Send/receive WhatsApp messages. Primary delivery channel. |
+| `wa-watcher.mjs` | Watch incoming WA messages, route to agent. |
+| `wa-inbox.mjs` | WA inbox management. |
+| `wa-send-media.mjs` | Send media files via WA. |
+| `wa-location-hook.mjs` | Process WA location pins → location-ledger.json. |
+| `wa-location-text-parser.mjs` | Parse WA address text blocks → location-ledger.json. |
+| `weather-daily.mjs` | 7am weather card — SP/Goiânia. Google Calendar integration. |
+| `news-daily.mjs` | 7:15am news digest. SerpAPI + gpt-4o-search-preview. Sends to direct chat. |
+| `icloud-digest.mjs` | iCloud mail digest — needs attention / promos. |
+| `job-monitor.mjs` | LinkedIn job matching via Adzuna. Daily report. |
+| `location-resolver.mjs` | Resolves Paulo's current location. WA ledger = Source 0 (highest priority). |
+| `location-utils.mjs` | Location utility functions. |
+| `location-hook.mjs` | Location arrival hooks — calendar conflict + travel time alerts. |
+| `heygen-video.mjs` | HeyGen v2 video generation — avatar + voice + scenes. |
+| `github-pages-publish.mjs` | Publish HTML to `pauloovidio-a11y/html-outputs` GitHub Pages. Convention: `YYYY-MM-DD-name.html`. |
+| `onedrive-share.mjs` | Generate OneDrive share links via Graph API. |
+| `notion-publish.mjs` | Publish content to Notion. |
+| `polar-workout-sync.mjs` | Sync workout data from Polar watch. |
+| `self-reflect.mjs` | Daily self-learning — reads session transcripts, builds learning card. Runs 23:50 BRT. |
+| `flight-monitor.mjs` | Flight price monitoring via Aviasales. |
+| `x-monitor.mjs` | Twitter/X monitoring. |
+| `llm-cost-daily.mjs` | Daily LLM cost tracking. |
+| `llm-cost-fetch-api.mjs` | Fetch LLM API usage/cost data. |
+| `c6-finance.mjs` | C6 Bank finance integration. |
+| `c6-statement-pipeline.mjs` | C6 statement processing pipeline. |
+| `pluggy-connect-server.mjs` | Pluggy Open Finance connection server. |
+| `dashboard-server.mjs` | Local dashboard server. |
+| `diagnose.mjs` | System diagnostics. |
+| `proposal-cmd.mjs` + `proposal-lib.mjs` | Proposal generation CLI. |
+| `skill-chain.mjs` | Chain multiple skills together. |
+| `mac-apply.mjs` + `mac-apply-command.mjs` | Apply commands to Mac Mini via osascript. |
+| `agent-reply.mjs` | Agent reply routing. |
+| `synthetic-ping.mjs` | Synthetic pings for system health checks. |
+| `calendar-holidays.mjs` | Holiday engine — Easter + moveable holidays. |
+
+---
+
+## 🎨 OUTPUT & PUBLISHING
+
+| Tool | Details |
+|------|---------|
+| **GitHub Pages (shared)** | Repo: `pauloovidio-a11y/html-outputs`. URL: `https://pauloovidio-a11y.github.io/html-outputs/`. Convention: `YYYY-MM-DD-name.html`. Shared with Superclawman. |
+| **GitHub Pages (reports)** | Repo: `pauloovidio-a11y/sandman-reports`. Videos stored here (MP4). |
+| **OneDrive Sync** | `/home/sandmanpo/OneDrive/sandman-reports/`. Systemd daemon. Share via Microsoft Graph API. |
+| **html-it skill** | 4-level HTML framework. Palette: ivory/slate/clay. Single-file (inline CSS/JS/SVG). Export button at Level 3+. |
+| **HeyGen Video** | Avatar: Brandon in Grey Suit (`Brandon_expressive2_public`). Voice: Calm Carlos PT-BR (`3b2a59d6edb54e79a40b29726a12d1c3`). Video Agent v3: `POST /v3/video-agents`. |
+
+---
+
+## 📍 LOCATION SYSTEM
+
+| Component | Detail |
+|-----------|--------|
+| **location-ledger.json** | `state/location-ledger.json`. Fields: `last_known_city`, `last_known_address`, `last_updated`, `last_known_source`, `confidence`. |
+| **Priority** | Source 0 = WA address text (highest). Source 1 = WA GPS pin. Source 2 = Google Calendar. Source 3 = Default. |
+| **iOS Shortcut** | Fires → Superclawman sends address block → `wa-location-text-parser.mjs` parses → ledger updated. |
+| **Confirmation format** | `✅ Location updated: Rua X, 000, Bairro, São Paulo SP` |
+
+---
+
+## 🤖 AUTOMATION / CRONS
+
+| Job | Schedule | Purpose |
+|-----|---------|---------|
+| **daily-briefing-7am** | 07:00 BRT | Weather card + calendar. One card, no follow-up. |
+| **news-digest-715am** | 07:15 BRT | News headlines. Script only, no commentary. |
+| **daily-self-learning** | 23:50 BRT | Reviews today's sessions, sends learning card to C2 group. Job ID: `fd25456b-f0a5-4501-bf93-d3ccbc39840e`. |
+| **job-monitor** | Daily | LinkedIn job matches via Adzuna. |
+| **icloud-digest** | Daily | iCloud mail digest. |
+
+---
+
+## 💬 WHATSAPP CHANNELS
+
+| Channel | ID | Purpose |
+|---------|----|---------|
+| **Paulo direct** | `556293902655` | Primary user channel. All notifications here. |
+| **C2 group** | `120363406507708378@g.us` | Command & control group. Self-learning reports sent here. |
+| **Superclawman** | Separate agent | Peer agent. Shares html-outputs repo. |
+
+---
+
+## 🔐 SECURITY NOTES
+- All credentials stored in `/root/.openclaw/workspace/credentials/`
+- Stripe is in **test mode** — no real charges
+- OneDrive OAuth token at `/home/sandmanpo/.config/onedrive/`
+- GitHub token has `repo` scope
+- QNAP SSH password stored in `qnap.json` — do not log publicly
